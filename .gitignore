@@ -1,0 +1,16 @@
+# Virtual environments (top-level and in subdirectories)
+venv/
+.venv/
+env/
+ENV/
+**/venv/
+**/.venv/
+**/env/
+**/ENV/
+
+# Python cache files (top-level and in subdirectories)
+__pycache__/
+**/__pycache__/
+*.py[cod]
+**/*.py[cod]
+*$py.class
