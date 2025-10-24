@@ -18,10 +18,10 @@ time.sleep(2)
 
 debug = False   #Set to true if debugging
 
-# For plotting
-time_log = []
-xb_log = []
-xd_log = []
+# # For plotting
+# time_log = []
+# xb_log = []
+# xd_log = []
 
 # Servo safe range (Modify as desired)
 MIN_ANGLE = 0           
@@ -42,9 +42,9 @@ w = 0.16        # Horizontal offset
 h = 0.12        # Vertical offset
 
 # For PID Control 
-Kp = 20     
-Ki = 3       
-Kd = 3
+Kp = 7.33
+Ki = 5.26
+Kd = 4.36     
 
 pid_lock = threading.Lock()
 
@@ -167,7 +167,7 @@ def beam_angle_to_servo_angle(theta, NEUTRAL_SERVO, debug=False):
 
 # Arduino Communication
 def send_servo_angle(servo_deg):
-    print(servo_deg)
+    # print(servo_deg)
     servo_deg = int(np.clip(servo_deg, MIN_ANGLE, MAX_ANGLE))
     try:
         arduino.write(bytes([servo_deg]))
@@ -186,6 +186,10 @@ def main():
     threading.Thread(target=control_loop, daemon=True).start()
 
     while True:
+
+        for _ in range(2):
+            cap.grab()
+
         ret, frame = cap.read()
         if not ret:
             break
@@ -219,17 +223,17 @@ def main():
     cap.release()
     cv2.destroyAllWindows()
 
-    # Show Plot at loop exit
-    plt.figure()
-    plt.plot(time_log, xb_log, label="Current Position (xb)")
-    plt.plot(time_log, xd_log, label="Desired Position (xd)", linestyle="--")
-    plt.xlabel("Time (s)")
-    plt.ylabel("Position (m)")  # or normalized units
-    plt.title(f"Ball Balancer Response\nKp={Kp}, Ki={Ki}, Kd={Kd}")
-    plt.legend()
-    plt.grid(True)
-    plt.ylim(-0.15, 0.15)
-    plt.show()
+    # # Show Plot at loop exit
+    # plt.figure()
+    # plt.plot(time_log, xb_log, label="Current Position (xb)")
+    # plt.plot(time_log, xd_log, label="Desired Position (xd)", linestyle="--")
+    # plt.xlabel("Time (s)")
+    # plt.ylabel("Position (m)")  # or normalized units
+    # plt.title(f"Ball Balancer Response\nKp={Kp}, Ki={Ki}, Kd={Kd}")
+    # plt.legend()
+    # plt.grid(True)
+    # plt.ylim(-0.15, 0.15)
+    # plt.show()
 
 # Control loop thread
 def control_loop():
@@ -267,11 +271,13 @@ def control_loop():
             # Start reference time on first frame for plotting
             if plot_time is None:
                 plot_time = frame_time
-            time_log.append(frame_time - plot_time)   # Time in seconds since start
-            xb_log.append(xb)                  # Current position
-            xd_log.append(0.0)                 # Desired position (currently 0.0 - replace with xd when using trajectory planner)
+            # time_log.append(frame_time - plot_time)   # Time in seconds since start
+            # xb_log.append(xb)                  # Current position
+            # xd_log.append(0.0)                 # Desired position (currently 0.0 - replace with xd when using trajectory planner)
 
             send_servo_angle(servo_deg_cmd)
+            arduino.reset_output_buffer()
+
             
             
         except queue.Empty:
@@ -320,3 +326,9 @@ def start_pid_gui():
 if __name__ == "__main__":
     threading.Thread(target=main, daemon=True).start()
     start_pid_gui()
+
+
+# BEST PID SETTINGS SO FAR:
+# Kp = 7.33
+# Ki = 5.26
+# Kd = 4.36

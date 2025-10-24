@@ -14,3 +14,9 @@ __pycache__/
 *.py[cod]
 **/*.py[cod]
 *$py.class
+
+# Ignore specified workshop and archive files
+**/Workshop 3.pptx
+**/Webcam/Workshop 1 Camera Tracking.docx
+**/PID Control/Workshop Intro to PID Control.docx
+**/Ball_balancer_code.zip
